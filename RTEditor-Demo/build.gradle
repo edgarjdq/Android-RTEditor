@@ -78,7 +78,8 @@ android {
 dependencies {
     // use this to compile/run locally
     compile project(':RTEditor-Toolbar')
-
+    compile 'com.github.woxthebox:draglistview:1.4.3'
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.8.3'
     // or this to use the latest published library
     //compile 'com.1gravity:android-rteditor:1.6.2'
 }

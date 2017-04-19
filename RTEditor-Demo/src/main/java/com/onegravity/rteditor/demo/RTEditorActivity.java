@@ -19,6 +19,7 @@ package com.onegravity.rteditor.demo;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -34,6 +35,9 @@ import com.onegravity.rteditor.api.RTMediaFactoryImpl;
 import com.onegravity.rteditor.api.RTProxyImpl;
 import com.onegravity.rteditor.api.format.RTFormat;
 import com.onegravity.rteditor.media.MediaUtils;
+
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 
 import java.io.File;
 
@@ -125,14 +129,6 @@ public class RTEditorActivity extends RTEditorBaseActivity {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (mRTManager != null) {
-            mRTManager.onDestroy(true);
-        }
-    }
-
-    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
@@ -146,7 +142,21 @@ public class RTEditorActivity extends RTEditorBaseActivity {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mRTManager != null) {
+            mRTManager.onDestroy(true);
+        }
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && requestCode == 1000) {
+            String[] items = data.getStringArrayExtra("items");
+            mRTMessageField.setRichTextEditing(true, TextUtils.join("", items));
+            return;
+        }
+
         if (resultCode == Activity.RESULT_OK && data != null && data.getData() != null && data.getData().getPath() != null) {
             String filePath = data.getData().getPath();
 
@@ -258,8 +268,25 @@ public class RTEditorActivity extends RTEditorBaseActivity {
         } else if (itemId == R.id.editor_fragment) {
             startAndFinish(RTEditorActivityWithFragment.class);
             return true;
+        } else if (itemId == R.id.rearrange) {
+            rearrange(mRTMessageField.getText(RTFormat.HTML));
+            return true;
         }
         return false;
+    }
+
+    private void rearrange(String text) {
+        Whitelist tags = Whitelist.relaxed()
+                .addTags("font")
+                .addAttributes("font", "style")
+                .addProtocols("img", "src", "http", "https", "data", "cid")
+                .addAttributes("img", "src")
+                .preserveRelativeLinks(true);
+        String[] items = text.split("\n");
+        for (int i = 0; i < items.length; i++) {
+            items[i] = Jsoup.clean(items[i], "http://example.com/", tags);
+        }
+        RearrangeActivity.show(this, items);
     }
 
     private void startAndFinish(Class<? extends Activity> clazz) {

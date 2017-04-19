@@ -58,6 +58,9 @@
             android:name="com.onegravity.rteditor.media.choose.MediaChooserActivity"/>
 
         <activity
+            android:name="com.onegravity.rteditor.demo.RearrangeActivity"/>
+
+        <activity
             android:name="com.onegravity.rteditor.media.crop.CropImageActivity"/>
 
     </application>

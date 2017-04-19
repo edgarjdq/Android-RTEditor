@@ -62,5 +62,11 @@
         android:orderInCategory="6"
         android:title="@string/menu_activity"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/rearrange"
+        android:alphabeticShortcut="f"
+        android:orderInCategory="6"
+        android:title="Reordenar"
+        app:showAsAction="never"/>
 
 </menu>
